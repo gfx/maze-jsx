@@ -30,59 +30,12 @@ TwoDArray.prototype.set = function(x, y, val) {
     this.data[this.width * y + x] = val;
 };
 
+
 ////////////////////
 // Maze
 ////////////////////
 function Maze(width, height) {
     // Member functions
-    this.startPoint = function() {
-        return {
-            x: 2 * randInt(this.start.x / 2, this.goal.x / 2),
-            y: 2 * randInt(this.start.y / 2, this.goal.y / 2),
-        };
-    };
-
-    this.stepForward = function(x, y) {
-        d =Direction.getRandDirection();
-        for (var i = 0; i < 4; ++i) {
-            if (d === Direction.RIGHT && this.maze_map.get(x+2, y) === 0) {
-                this.maze_map.set(x+1, y, this.PATH);
-                this.maze_map.set(x+2, y, this.PATH);
-                return {new_x: x+2, new_y: y};
-            }
-            else if (d === Direction.UP && this.maze_map.get(x, y-2) === 0) {
-                this.maze_map.set(x, y-1, this.PATH);
-                this.maze_map.set(x, y-2, this.PATH);
-                return {new_x: x, new_y: y-2};
-            }
-            if (d === Direction.LEFT && this.maze_map.get(x-2, y) === 0) {
-                this.maze_map.set(x-1, y, this.PATH);
-                this.maze_map.set(x-2, y, this.PATH);
-                return {new_x: x-2, new_y: y};
-            }
-            if (d === Direction.DOWN && this.maze_map.get(x, y+2) === 0) {
-                this.maze_map.set(x, y+1, this.PATH);
-                this.maze_map.set(x, y+2, this.PATH);
-                return {new_x: x, new_y: y+2};
-            }
-            d = Direction.rot90(d);
-        }
-        return undefined;
-    };
-
-    this.dig = function(x, y) {
-        while (true) {
-            var p = this.stepForward(x, y);
-            if (!p) return;
-            this.dig(p.new_x, p.new_y);
-        }
-    };
-
-    this.create = function() {
-        var p = this.startPoint();
-        this.dig(p.x, p.y);
-    };
-
     this.drawPoint = function(x, y, color_hex_str) {
         this.ctx.fillStyle = color_hex_str;
         this.ctx.fillRect(this.BRICK_SZ * x, this.BRICK_SZ * y,
@@ -135,6 +88,51 @@ function Maze(width, height) {
         this.maze_map.set(this.maze_map.width - 1, j, this.PATH);
     }
 };
+Maze.prototype.getRandStartPoint = function() {
+    return {
+        x: 2 * randInt(this.start.x / 2, this.goal.x / 2),
+        y: 2 * randInt(this.start.y / 2, this.goal.y / 2),
+    };
+};
+Maze.prototype.stepForward = function(x, y) {
+    d =Direction.getRandDirection();
+    for (var i = 0; i < 4; ++i) {
+        if (d === Direction.RIGHT && this.maze_map.get(x+2, y) === 0) {
+            this.maze_map.set(x+1, y, this.PATH);
+            this.maze_map.set(x+2, y, this.PATH);
+            return {new_x: x+2, new_y: y};
+        }
+        else if (d === Direction.UP && this.maze_map.get(x, y-2) === 0) {
+            this.maze_map.set(x, y-1, this.PATH);
+            this.maze_map.set(x, y-2, this.PATH);
+            return {new_x: x, new_y: y-2};
+        }
+        if (d === Direction.LEFT && this.maze_map.get(x-2, y) === 0) {
+            this.maze_map.set(x-1, y, this.PATH);
+            this.maze_map.set(x-2, y, this.PATH);
+            return {new_x: x-2, new_y: y};
+        }
+        if (d === Direction.DOWN && this.maze_map.get(x, y+2) === 0) {
+            this.maze_map.set(x, y+1, this.PATH);
+            this.maze_map.set(x, y+2, this.PATH);
+            return {new_x: x, new_y: y+2};
+        }
+        d = Direction.rot90(d);
+    }
+    return undefined;
+};
+Maze.prototype.dig = function(x, y) {
+    while (true) {
+        var p = this.stepForward(x, y);
+        if (!p) return;
+        this.dig(p.new_x, p.new_y);
+    }
+};
+Maze.prototype.create = function() {
+    var p = this.getRandStartPoint();
+    this.dig(p.x, p.y);
+};
+
 
 function getMazeSize() {
     return {
@@ -184,15 +182,15 @@ function MazeSolverNode(x, y, prevNode) {
 
 function MazeVisitedMap(width, height) {
     this.visit = function(x, y) {
-        this.visited_data[this.width * y + x] = true;
+        this.visited_map.set(x, y, true);
     };
     this.isVisited = function(x, y) {
-        return this.visited_data[this.width * y + x];
+        return this.visited_map.get(x, y);
     }
 
     this.width = width;
     this.height = height;
-    this.visited_data = new Array(this.width * this.height);
+    this.visited_map = new TwoDArray(this.width + 2, this.height + 2);
 }
 
 function drawStartGoalPath(goalNode) {
