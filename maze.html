@@ -7,13 +7,16 @@
       canvas { border: 1px solid #999; }
     </style>
   </head>
-  <body onload="mazeMain();">
+  <body onload="mazeCreate();">
     <p>左上スタート，右下ゴール</p>
     <canvas id="maze_canvas" width="400" height="300"></canvas>
     <form id="maze_form">
-      <input type="text" id="maze_width" size="5" value="35" />
-      <input type="text" id="maze_height" size="5" value="35" />
-      <input type="button" onclick="mazeMain()" value="サイズ変更" />
+      <fieldset>
+        <input type="text" id="maze_width" size="5" value="35" />
+        <input type="text" id="maze_height" size="5" value="35" />
+        <input type="button" onclick="mazeCreate()" value="サイズ変更" />
+      </fieldset>
+      <input type="button" onclick="mazeSolve()" value="答えを見る" />
     </form>
   </body>
 </html>
