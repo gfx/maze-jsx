@@ -61,21 +61,6 @@ class Array2D.<T> {
         this.data[this.width * y + x] = val;
     }
 
-    function draw(canvas : HTMLCanvasElement, fromX : int, fromY : int, toX : int, toY : int) : void {
-        canvas.width  = Config.BRICK_SZ * (toX - fromY + 1);
-        canvas.height = Config.BRICK_SZ * (toX - fromY + 1);
-
-        var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-
-        for (var xi = fromY; xi <= toY; ++xi) {
-            for (var yi = fromX; yi <= toX; ++yi) {
-                ctx.fillStyle = MazeElem.getColor(this.get(xi, yi) as int);
-                ctx.fillRect(Config.BRICK_SZ * (xi - fromX),
-                             Config.BRICK_SZ * (yi - fromY),
-                             Config.BRICK_SZ, Config.BRICK_SZ);
-            }
-        }
-    }
 }
 
 class Point {
@@ -172,6 +157,23 @@ class Maze {
         var p = this.getRandStartPoint();
         this.dig(p.x, p.y);
     }
+
+    function draw(canvas : HTMLCanvasElement, fromX : int, fromY : int, toX : int, toY : int) : void {
+        canvas.width  = Config.BRICK_SZ * (toX - fromY + 1);
+        canvas.height = Config.BRICK_SZ * (toX - fromY + 1);
+
+        var ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+        for (var xi = fromY; xi <= toY; ++xi) {
+            for (var yi = fromX; yi <= toX; ++yi) {
+                ctx.fillStyle = MazeElem.getColor(this.mazeMap.get(xi, yi));
+                ctx.fillRect(Config.BRICK_SZ * (xi - fromX),
+                             Config.BRICK_SZ * (yi - fromY),
+                             Config.BRICK_SZ, Config.BRICK_SZ);
+            }
+        }
+    }
+
 }
 
 // Tree node for BFS
@@ -220,9 +222,9 @@ class _Main {
         maze.create();
 
         var canvas = dom.id('maze_canvas') as HTMLCanvasElement;
-        maze.mazeMap.draw(canvas,
-                           maze.leftTop.x,     maze.leftTop.y,
-                           maze.rightBottom.x, maze.rightBottom.y);
+        maze.draw(canvas,
+                  maze.leftTop.x,     maze.leftTop.y,
+                  maze.rightBottom.x, maze.rightBottom.y);
     }
 
     static function drawStartGoalPath(goalNode : SolverNode) : void {
@@ -236,9 +238,9 @@ class _Main {
         maze.mazeMap.set(v.p.x, v.p.y, MazeElem.SHORTEST_PATH);
 
         var canvas = dom.id('maze_canvas') as HTMLCanvasElement;
-        maze.mazeMap.draw(canvas,
-                          maze.leftTop.x,     maze.leftTop.y,
-                          maze.rightBottom.x, maze.rightBottom.y);
+        maze.draw(canvas,
+                  maze.leftTop.x,     maze.leftTop.y,
+                  maze.rightBottom.x, maze.rightBottom.y);
     }
 
     static function getAdjandantNodes(node : SolverNode) : Array.<SolverNode> {
