@@ -2,21 +2,21 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>迷路</title>
-    <script type="text/javascript" src="maze.js"></script>
+    <script type="text/javascript" src="maze.jsx.js"></script>
     <style type="text/css">
       canvas { border: 1px solid #999; }
     </style>
   </head>
-  <body onload="mazeCreate();">
+  <body>
     <p>左上スタート，右下ゴール</p>
     <canvas id="maze_canvas" width="400" height="300"></canvas>
     <form id="maze_form">
       <fieldset>
         <input type="text" id="maze_width" size="5" value="35" />
         <input type="text" id="maze_height" size="5" value="35" />
-        <input type="button" onclick="mazeCreate()" value="サイズ変更" />
+        <input type="button" id="recreate" value="サイズ変更" />
       </fieldset>
-      <input type="button" onclick="mazeSolve()" value="答えを見る" />
+      <input type="button" id="show" value="答えを見る" />
     </form>
   </body>
 </html>
